@@ -14,7 +14,7 @@ $(function () {
   var $dataScaleX = $('#dataScaleX');
   var $dataScaleY = $('#dataScaleY');
   var options = {
-        aspectRatio: NaN,
+        aspectRatio: 1 / 1 ,
         preview: '.img-preview',
         crop: function (e) {
           $dataX.val(Math.round(e.x));

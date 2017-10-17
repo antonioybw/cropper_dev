@@ -128,6 +128,10 @@
       <div class="col-md-3">
         <div class="alert alert-success" role="alert" id="success-alert"> Save data done !</div>
         <div class="alert alert-warning" role="alert" id="warning-alert"> Reach end of image series!</div>
+        <div class="alert alert-success" role="alert" id="new_process_success"> New Process Success!</div>
+        <div class="alert alert-warning" role="alert" id="process_exist"> Process Name Exist! Cannot new</div>
+        <div class="alert alert-success" role="alert" id="continue_process_success"> Coninue Process success</div>
+        <div class="alert alert-warning" role="alert" id="process_not_exist"> Cannot find process with given name</div>
       </div>
 
 
@@ -158,15 +162,49 @@
         </div>
 
         <label class="form-check-label">
-          <input class="form-check-input" type="checkbox" id="save_key_up" checked>
+          <input class="form-check-input" type="checkbox" id="save_key_up">
           Save crop data when mouse key up
         </label>
       </div>
 
+      <div class="col-md-7" style="margin-bottom: 8px;">
+        <div class="input-group">
+          <span class="input-group-addon" id="basic-addon1">New a crop process: </span>
+          <input type="text" class="form-control" placeholder="type a process name" aria-describedby="basic-addon1" id="new_process_name">
+        </div>
+      </div>
+
+      <div class="col-md-5" style="margin-bottom: 8px;">
+        <button type="button" class="btn btn-default" id="new_process_button" data-method="" data-option="crop" title="New a crop process">
+            <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Save Cropped Coordinates Data">
+              New
+            </span>
+        </button>
+      </div>
+
+
+
+      <div class="col-md-7" style="margin-bottom: 8px;">
+        <div class="input-group">
+          <span class="input-group-addon" id="basic-addon1">Continue a crop process: </span>
+          <input type="text" class="form-control" placeholder="type an existing process name" aria-describedby="basic-addon1" id="continue_process_name">
+        </div>
+      </div>
+
+      <div class="col-md-5" style="margin-bottom: 8px;">
+        <button type="button" class="btn btn-default" id="continue_process_button" data-method="" data-option="crop" title="Continue an existing crop process">
+            <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Save Cropped Coordinates Data">
+              Continue
+            </span>
+        </button>
+      </div>
+
+
+
       <div class="col-md-12" style="margin-bottom: 8px;">
         <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">Save crop data @ /home/bowen/mnt_all/cropper_16123/cropper_dev/</span>
-          <input type="text" class="form-control" placeholder="save crop data file name" aria-describedby="basic-addon1" id="data_list_name">
+          <span class="input-group-addon" >Save crop data @ </span><span class="input-group-addon" id="save_list_path"> /home/bowen/mnt_all/cropper_16123/cropper_dev/crop_data/img_crop_data.txt</span>
+          <!-- <input type="text" class="form-control" placeholder="save crop data file name" aria-describedby="basic-addon1" id="data_list_name"> -->
         </div>
       </div>
 
@@ -411,7 +449,7 @@
               4:3
             </span>
           </label>
-          <label class="btn btn-primary">
+          <label class="btn btn-primary active">
             <input type="radio" class="sr-only" id="aspectRatio2" name="aspectRatio" value="1">
             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="aspectRatio: 1 / 1">
               1:1
@@ -423,7 +461,7 @@
               2:3
             </span>
           </label>
-          <label class="btn btn-primary active">
+          <label class="btn btn-primary">
             <input type="radio" class="sr-only" id="aspectRatio4" name="aspectRatio" value="NaN">
             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="aspectRatio: NaN">
               Free
@@ -616,6 +654,10 @@
   <script type="text/javascript">
     $("#success-alert").hide();
     $("#warning-alert").hide();
+    $("#new_process_success").hide();
+    $("#process_exist").hide();
+    $("#continue_process_success").hide();
+    $("#process_not_exist").hide();
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
     socket.on('connect', function() {
@@ -638,7 +680,7 @@
     var $dataScaleX = $('#dataScaleX');
     var $dataScaleY = $('#dataScaleY');
     var options = {
-        aspectRatio: NaN,
+        aspectRatio: 1 / 1,
         preview: '.img-preview',
         crop: function (e) {
           $dataX.val(Math.round(e.x));
@@ -702,21 +744,88 @@
     function send_data_to_server(){
         crop_data=$("#image").cropper("getData");
         crop_data['image_name']=img_list[cur_idx];
-        crop_data['data_list']=$('#data_list_name').val();
+        crop_data['last_idx']=cur_idx;
         console.log(crop_data);
         socket.emit('crop_data_submit', crop_data);
 
-        //socket on receive success from server
-        socket.on('success_save', function(data) {
-          $("#success-alert").fadeTo(1000, 500).slideUp(500, function(){
-               $("#success-alert").slideUp(500);
-          });
-        });
-
-        //
+        
       }
 
+    //socket on receive success from server
+    socket.on('success_save', function(data) {
+      $("#success-alert").fadeTo(1000, 500).slideUp(500, function(){
+           $("#success-alert").slideUp(500);
+      });
+    });
+
+    //
+
     $('#send_coordinates').click(send_data_to_server);
+
+
+
+    // function to new process:
+    function new_process(){
+      new_process_name=$('#new_process_name').val()
+      console.log("new a process :"+new_process_name)
+      console.log("length :"+new_process_name.length)
+      if(new_process_name.length==0){
+        return;
+      }
+      console.log("new a process :"+new_process_name)
+      socket.emit('new_process', {'new_process_name':new_process_name});
+    }
+
+    socket.on('new_process_success', function(data) {
+      $("#new_process_success").fadeTo(1000, 500).slideUp(500, function(){
+           $("#new_process_success").slideUp(500);
+      });
+      $('#save_list_path').text('/home/bowen/mnt_all/cropper_16123/cropper_dev/crop_data/'+data['process_file_name'])
+    });
+
+    socket.on('new_process_fail', function(data) {
+      $("#process_exist").fadeTo(1000, 500).slideUp(500, function(){
+           $("#process_exist").slideUp(500);
+      });
+    });
+
+    $('#new_process_button').click(new_process);
+
+
+    // function to continue process:
+
+    function continue_process(){
+      continue_process_name=$('#continue_process_name').val()
+      if(continue_process_name.length==0){
+        return;
+      }
+      console.log(" continue a process :"+continue_process_name)
+      socket.emit('continue_process', {'continue_process_name':continue_process_name});
+    }
+
+    socket.on('continue_process_success', function(data) {
+      $("#continue_process_success").fadeTo(1000, 500).slideUp(500, function(){
+           $("#continue_process_success").slideUp(500);
+      });
+      $('#save_list_path').text('/home/bowen/mnt_all/cropper_16123/cropper_dev/crop_data/'+data['process_file_name'])
+      cur_idx=Number(data['last_idx'])+1;
+      console.log("resume to that process")
+      console.log(cur_idx=Number(data['last_idx'])+1);
+      if (cur_idx>=total_len-1){
+          cur_idx=total_len-1;
+      }
+      $("#image").cropper('destroy').attr('src', '/static/images/'+img_list[cur_idx]).cropper(options);
+      update_image_tag();
+      console.log("after resume")
+    });
+
+    socket.on('continue_process_fail', function(data) {
+      $("#process_not_exist").fadeTo(1000, 500).slideUp(500, function(){
+           $("#process_not_exist").slideUp(500);
+      });
+    });
+
+    $('#continue_process_button').click(continue_process);
 
 
 

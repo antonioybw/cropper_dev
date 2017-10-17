@@ -8,6 +8,8 @@
  * Date: 2017-10-11T13:34:24.201Z
  */
 
+ //
+
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
 	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
@@ -1025,6 +1027,8 @@ var render = {
     // cropBox.top = canvas.top + (canvas.height - cropBox.height) / 2;
     // cropBox.oldLeft = cropBox.left;
     // cropBox.oldTop = cropBox.top;
+
+    // my modified code
     // changed the initial cropbox position:
     cropBox.width = 50;
     cropBox.height = 50;
