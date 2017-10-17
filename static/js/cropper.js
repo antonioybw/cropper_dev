@@ -1017,10 +1017,19 @@ var render = {
     cropBox.height = Math.min(Math.max(cropBox.height, cropBox.minHeight), cropBox.maxHeight);
 
     // The width of auto crop area must large than "minWidth", and the height too. (#164)
-    cropBox.width = Math.max(cropBox.minWidth, cropBox.width * autoCropArea);
-    cropBox.height = Math.max(cropBox.minHeight, cropBox.height * autoCropArea);
-    cropBox.left = canvas.left + (canvas.width - cropBox.width) / 2;
-    cropBox.top = canvas.top + (canvas.height - cropBox.height) / 2;
+
+    
+    // cropBox.width = Math.max(cropBox.minWidth, cropBox.width * autoCropArea);
+    // cropBox.height = Math.max(cropBox.minHeight, cropBox.height * autoCropArea);
+    // cropBox.left = canvas.left + (canvas.width - cropBox.width) / 2;
+    // cropBox.top = canvas.top + (canvas.height - cropBox.height) / 2;
+    // cropBox.oldLeft = cropBox.left;
+    // cropBox.oldTop = cropBox.top;
+    // changed the initial cropbox position:
+    cropBox.width = 50;
+    cropBox.height = 50;
+    cropBox.left = canvas.left + (canvas.width - cropBox.width) ;
+    cropBox.top = canvas.top + (canvas.height - cropBox.height) ;
     cropBox.oldLeft = cropBox.left;
     cropBox.oldTop = cropBox.top;
 

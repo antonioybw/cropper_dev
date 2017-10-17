@@ -9,12 +9,12 @@ from flask_socketio import SocketIO
 from flask_socketio import send, emit
 import subprocess
 import time
-
+# 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 
-detect_img_path='/Users/Antonio/workspace/cropper_dev/static/images'
+detect_img_path='/root/host_workspace/cropper_dev/static/images'
 
 def find_img_list():
   img_list=[]
@@ -37,6 +37,13 @@ def crop():
 @socketio.on('crop_data_submit')
 def save_crop_data(message):
     print message
+    save_list_name='img_crop_data.txt'
+    if( len(message['data_list']) >0 ):
+      save_list_name=message['data_list']
+    with open('/root/host_workspace/cropper_dev/'+save_list_name,'a+') as cropfile:
+      cropfile.write(json.dumps(message)+'\n')
+      emit('success_save', 'crop data saved to server')
+    
 
 
 if __name__ == '__main__':

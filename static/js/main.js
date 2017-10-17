@@ -14,7 +14,7 @@ $(function () {
   var $dataScaleX = $('#dataScaleX');
   var $dataScaleY = $('#dataScaleY');
   var options = {
-        aspectRatio: 16 / 9,
+        aspectRatio: NaN,
         preview: '.img-preview',
         crop: function (e) {
           $dataX.val(Math.round(e.x));
@@ -48,6 +48,13 @@ $(function () {
     },
     cropend: function (e) {
       console.log(e.type, e.action);
+      // console.log(e.type);
+      // add my block on crop end
+      if ($('#save_key_up').is(":checked")){
+        send_data_to_server();
+      }
+      
+      // add my block on crop end
     },
     crop: function (e) {
       console.log(e.type, e.x, e.y, e.width, e.height, e.rotate, e.scaleX, e.scaleY);
